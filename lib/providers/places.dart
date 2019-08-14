@@ -39,6 +39,10 @@ class Places with ChangeNotifier {
     });
   }
 
+  Place findById(String id) {
+    return _items.firstWhere((place) => place.id == id);
+  }
+
   Future<void> fetchPlaces() async {
     final dataList = await DBHelper.getData('user_places');
     _items = dataList
