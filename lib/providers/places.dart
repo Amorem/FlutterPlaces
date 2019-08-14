@@ -1,6 +1,9 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_places/models/place.dart';
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+
+import '../models/place.dart';
+import '../helpers/db_helper.dart';
 
 class Places with ChangeNotifier {
   List<Place> _items = [];
@@ -18,5 +21,10 @@ class Places with ChangeNotifier {
     );
     _items.add(newPlace);
     notifyListeners();
+    DBHelper.insert('places', {
+      'id': newPlace.id,
+      'title': newPlace.title,
+      'image': newPlace.image.path,
+    });
   }
 }
