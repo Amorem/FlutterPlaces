@@ -1,4 +1,4 @@
-package com.example.flutter_places;
+package dev.amorem.flutter_places;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
