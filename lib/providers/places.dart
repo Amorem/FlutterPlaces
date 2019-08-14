@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/place.dart';
 import '../helpers/db_helper.dart';
+import '../helpers/location_helper.dart';
 
 class Places with ChangeNotifier {
   List<Place> _items = [];
@@ -12,12 +13,19 @@ class Places with ChangeNotifier {
     return [..._items];
   }
 
-  void addPlace(String pickedTitle, File pickedImage) {
+  Future<void> addPlace(String pickedTitle, File pickedImage,
+      PlaceLocation pickedLocation) async {
+    final address = await LocationHelper.getPlaceAdress(
+        pickedLocation.latitude, pickedLocation.longitude);
+    final updatedLocation = PlaceLocation(
+        latitude: pickedLocation.latitude,
+        longitude: pickedLocation.longitude,
+        adress: address);
     final newPlace = Place(
       id: DateTime.now().toString(),
       image: pickedImage,
       title: pickedTitle,
-      location: null,
+      location: updatedLocation,
     );
     _items.add(newPlace);
     notifyListeners();
@@ -25,17 +33,26 @@ class Places with ChangeNotifier {
       'id': newPlace.id,
       'title': newPlace.title,
       'image': newPlace.image.path,
+      'loc_lat': newPlace.location.latitude,
+      'loc_lng': newPlace.location.longitude,
+      'address': newPlace.location.adress
     });
   }
 
   Future<void> fetchPlaces() async {
     final dataList = await DBHelper.getData('user_places');
     _items = dataList
-        .map((item) => Place(
+        .map(
+          (item) => Place(
             id: item['id'],
             title: item['title'],
             image: File(item['image']),
-            location: null))
+            location: PlaceLocation(
+                latitude: item['loc_lat'],
+                longitude: item['loc_lng'],
+                adress: item['address']),
+          ),
+        )
         .toList();
     notifyListeners();
   }
